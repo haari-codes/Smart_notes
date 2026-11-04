@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart_Notes | Learn Smart. Remember More.</title>
+<style>
+:root{--purple:#6c4bd8;--deep:#4b32a8;--pale:#f1edff;--ink:#24213a;--muted:#77738d;--line:#e8e4f2;--bg:#f8f7fc;--danger:#d94358;--shadow:0 10px 30px rgba(56,37,111,.08)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,sans-serif;line-height:1.5}
+header{background:linear-gradient(120deg,#5637bd,#8b6bea);color:white;padding:25px max(18px,calc((100% - 1100px)/2))}
+.brand{font-size:25px;font-weight:800}
+.tagline{opacity:.9;margin-top:4px}
+nav{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+nav button{background:#ffffff20;color:white;border:1px solid #ffffff55;padding:9px 13px;border-radius:20px;cursor:pointer}
+nav button.active,nav button:hover{background:white;color:var(--deep)}
+main{max-width:1100px;margin:24px auto;padding:0 16px 50px}
+.hero,.feature,.panel{background:white;border:1px solid var(--line);border-radius:17px;padding:20px;box-shadow:var(--shadow)}
+.hero{margin-bottom:20px}
+.hero h1{margin:0 0 5px;font-size:clamp(23px,4vw,32px)}
+.hero p,.feature p{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:18px 0}
+.feature{padding:17px}
+.feature .emoji{font-size:25px}
+.feature h3{margin:8px 0 4px}
+.feature p{font-size:14px;margin:0 0 12px}
+button{border:0;border-radius:10px;background:var(--purple);color:white;padding:10px 15px;font-weight:700;cursor:pointer;font-size:14px}
+button:hover{background:var(--deep)}
+button.secondary{background:var(--pale);color:var(--deep)}
+button.danger{background:#fff0f1;color:var(--danger)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.panel{margin:18px 0}
+.panel h2{margin:0 0 14px;font-size:21px}
+input,textarea{width:100%;padding:12px;border:1px solid #dcd6eb;border-radius:10px;font:inherit;margin:5px 0 12px}
+textarea{min-height:130px;resize:vertical}
+label{font-size:14px;font-weight:700}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1}
+.row button{flex:0 0 auto}
+.note{border:1px solid var(--line);border-radius:13px;padding:15px;margin:12px 0;background:#fff}
+.note h3{margin:0 0 4px}
+.meta{color:var(--muted);font-size:12px;margin-bottom:8px}
+.note p{white-space:pre-wrap;margin:7px 0 12px;overflow-wrap:anywhere}
+.hidden{display:none!important}
+.muted,small{color:var(--muted)}
+.output{background:#fbfaff;border:1px solid var(--line);border-radius:12px;padding:15px;white-space:pre-wrap;overflow-wrap:anywhere;min-height:55px}
+.flashcard{min-height:160px;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--pale);border-radius:16px;padding:24px;font-size:20px;font-weight:700;cursor:pointer}
+.quiz-option{display:block;width:100%;text-align:left;margin:8px 0;background:#f1edff;color:var(--deep)}
+.correct{background:#e4f8ec!important;color:#176b38!important}
+.wrong{background:#ffebed!important;color:#a51e31!important}
+footer{text-align:center;color:var(--muted);padding:20px;font-size:13px}
+.top-actions{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+@media(max-width:600px){
+header{padding:20px 16px}
+.brand{font-size:22px}
+.panel{padding:15px}
+.row>*{min-width:100%}
+.row button{width:100%}
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="brand">📚 Smart_Notes</div>
+<div class="tagline">Learn Smart. Remember More.</div>
+<nav>
+<button class="active" data-page="home" onclick="showPage('home',this)">Home</button>
+<button data-page="notes" onclick="showPage('notes',this)">My Notes</button>
+<button data-page="study" onclick="showPage('study',this)">Study Tools</button>
+</nav>
+</header>
+
+<main>
+
+<section id="home" class="page">
+<div class="hero">
+<h1>Your personal study space ✨</h1>
+<p>Keep your notes organised and revise with simple study tools.</p>
+</div>
+
+<div class="grid">
+<div class="feature">
+<div class="emoji">📝</div>
+<h3>Create Notes</h3>
+<p>Write and organise your study notes.</p>
+<button onclick="showPage('notes')">Open Notes</button>
+</div>
+
+<div class="feature">
+<div class="emoji">🧠</div>
+<h3>Smart Summary</h3>
+<p>Create a quick summary from your text.</p>
+<button onclick="showPage('study');document.getElementById('summaryInput').focus()">Make Summary</button>
+</div>
+
+<div class="feature">
+<div class="emoji">🃏</div>
+<h3>Flashcards</h3>
+<p>Turn key points into revision cards.</p>
+<button onclick="showPage('study');document.getElementById('flashInput').focus()">Make Flashcards</button>
+</div>
+
+<div class="feature">
+<div class="emoji">❓</div>
+<h3>Quiz Generator</h3>
+<p>Generate practice questions from your material.</p>
+<button onclick="showPage('study');document.getElementById('quizInput').focus()">Create Quiz</button>
+</div>
+</div>
+
+<div class="panel">
+<div class="top-actions">
+<div><h2>Recent Notes</h2><small>Your saved notes on this browser</small></div>
+<button class="secondary" onclick="showPage('notes')">View all</button>
+</div>
+<div id="recentNotes"></div>
+</div>
+</section>
+
+<section id="notes" class="page hidden">
+<div class="panel">
+<div class="top-actions">
+<h2>📝 My Notes</h2>
+<button onclick="openNoteForm()">+ Create Note</button>
+</div>
+
+<input id="noteSearch" placeholder="Search by title, subject or content..." oninput="displayNotes()">
+
+<div id="noteForm" class="hidden">
+<h3 id="formHeading">Create a Note</h3>
+<form id="notesForm">
+<label>Title</label>
+<input id="noteTitle" required maxlength="100" placeholder="e.g. Data Structures">
+
+<label>Subject</label>
+<input id="noteSubject" maxlength="60" placeholder="e.g. Computer Science">
+
+<label>Content</label>
+<textarea id="noteContent" required placeholder="Write your notes here..."></textarea>
+
+<div class="row">
+<button type="submit">Save Note</button>
+<button type="button" class="secondary" onclick="closeNoteForm()">Cancel</button>
+</div>
+</form>
+</div>
+
+<div id="notesList"></div>
+</div>
+</section>
+
+<section id="study" class="page hidden">
+
+<div class="panel">
+<h2>🧠 Smart Summary</h2>
+<p class="muted">Paste your study material to create a basic key-sentence summary.</p>
+<textarea id="summaryInput" placeholder="Paste your study material here..."></textarea>
+<div class="row">
+<button onclick="makeSummary()">Generate Summary</button>
+<button class="secondary" onclick="copyOutput('summaryOutput')">Copy Summary</button>
+</div>
+<div id="summaryOutput" class="output">Your summary will appear here.</div>
+</div>
+
+<div class="panel">
+<h2>🃏 Flashcard Maker</h2>
+<p class="muted">Add one fact or definition per line. Each line becomes a card.</p>
+<textarea id="flashInput" placeholder="HTML is used to structure web pages.
+CSS is used to style web pages."></textarea>
+<button onclick="makeFlashcards()">Create Flashcards</button>
+
+<div id="flashArea" class="hidden">
+<div id="flashCard" class="flashcard" onclick="flipFlashcard()">Your flashcard</div>
+<div class="row" style="margin-top:12px">
+<button class="secondary" onclick="previousCard()">Previous</button>
+<button onclick="nextCard()">Next</button>
+</div>
+<p id="flashCount" class="muted"></p>
+</div>
+</div>
+
+<div class="panel">
+<h2>❓ Quiz Generator</h2>
+<p class="muted">Paste study content to generate fill-in-the-blank questions.</p>
+<textarea id="quizInput" placeholder="Paste your study material here..."></textarea>
+<button onclick="makeQuiz()">Generate Quiz</button>
+<div id="quizArea"></div>
+</div>
+
+</section>
+</main>
+
+<footer>Made with 💜 by Haari_Codes · Smart_Notes</footer>
+
+<script>
+const STORAGE_KEY='smartNotes';
+let notes=[];
+let editingIndex=-1;
+let flashcards=[],flashIndex=0,flashFlipped=false;
+let quizQuestions=[],quizIndex=0,quizScore=0;
+
+try{
+notes=JSON.parse(localStorage.getItem(STORAGE_KEY))||[];
+if(!Array.isArray(notes))notes=[];
+}catch(e){notes=[];}
+
+function persistNotes(){
+localStorage.setItem(STORAGE_KEY,JSON.stringify(notes));
+displayNotes();
+displayRecentNotes();
+}
+
+function showPage(id,button){
+document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+const target=button||document.querySelector('nav button[data-page="'+id+'"]');
+if(target)target.classList.add('active');
+if(id==='notes')displayNotes();
+if(id==='home')displayRecentNotes();
+window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function openNoteForm(index=-1){
+editingIndex=index;
+document.getElementById('noteForm').classList.remove('hidden');
+document.getElementById('formHeading').textContent=index<0?'Create a Note':'Edit Note';
+document.getElementById('noteTitle').value=index<0?'':notes[index].title;
+document.getElementById('noteSubject').value=index<0?'':(notes[index].subject||'');
+document.getElementById('noteContent').value=index<0?'':notes[index].content;
+document.getElementById('noteTitle').focus();
+}
+
+function closeNoteForm(){
+document.getElementById('noteForm').classList.add('hidden');
+document.getElementById('notesForm').reset();
+editingIndex=-1;
+}
+
+document.getElementById('notesForm').addEventListener('submit',e=>{
+e.preventDefault();
+
+const title=document.getElementById('noteTitle').value.trim();
+const subject=document.getElementById('noteSubject').value.trim();
+const content=document.getElementById('noteContent').value.trim();
+
+if(!title||!content)return;
+
+const note={title,subject,content,updatedAt:new Date().toISOString()};
+
+if(editingIndex<0)notes.unshift(note);
+else notes[editingIndex]=note;
+
+persistNotes();
+closeNoteForm();
+});
+
+function escapeHTML(value){
+return String(value??'').replace(/[&<>"']/g,c=>({
+'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[c]));
+}
+
+function displayNotes(){
+const list=document.getElementById('notesList');
+if(!list)return;
+
+const q=(document.getElementById('noteSearch')?.value||'').toLowerCase();
+
+const filtered=notes.map((n,i)=>({...n,_index:i}))
+.filter(n=>(n.title+' '+(n.subject||'')+' '+n.content).toLowerCase().includes(q));
+
+if(!filtered.length){
+list.innerHTML='<p class="muted">'+(notes.length?'No matching notes found.':'No notes yet. Create your first note!')+'</p>';
+return;
+}
+
+list.innerHTML=filtered.map(n=>`
+<article class="note">
+<h3>${escapeHTML(n.title)}</h3>
+<div class="meta">${escapeHTML(n.subject||'No subject')} · ${n.updatedAt?'Updated '+new Date(n.updatedAt).toLocaleString():'Saved note'}</div>
+<p>${escapeHTML(n.content.length>450?n.content.slice(0,450)+'…':n.content)}</p>
+<div class="row">
+<button class="secondary" onclick="openNoteForm(${n._index})">Edit</button>
+<button class="danger" onclick="deleteNote(${n._index})">Delete</button>
+</div>
+</article>`).join('');
+}
+
+function displayRecentNotes(){
+const box=document.getElementById('recentNotes');
+if(!box)return;
+
+if(!notes.length){
+box.innerHTML='<p class="muted">No notes saved yet.</p>';
+return;
+}
+
+box.innerHTML=notes.slice(0,3).map(n=>`
+<div class="note">
+<h3>${escapeHTML(n.title)}</h3>
+<div class="meta">${escapeHTML(n.subject||'No subject')}</div>
+<p>${escapeHTML(n.content.slice(0,130))}${n.content.length>130?'…':''}</p>
+</div>`).join('');
+}
+
+function deleteNote(index){
+if(confirm('Delete this note?')){
+notes.splice(index,1);
+persistNotes();
+}
+}
+
+displayNotes();
+displayRecentNotes();
+
+function sentences(text){
+return text.replace(/\s+/g,' ').split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(s=>s.length>25);
+}
+
+function makeSummary(){
+const text=document.getElementById('summaryInput').value.trim();
+const out=document.getElementById('summaryOutput');
+
+if(text.length<40){
+out.textContent='Please enter a little more study material.';
+return;
+}
+
+const parts=sentences(text);
+if(parts.length<2){
+out.textContent=text;
+return;
+}
+
+const words=text.toLowerCase().match(/[a-z0-9]{3,}/g)||[];
+const freq={};
+words.forEach(w=>freq[w]=(freq[w]||0)+1);
+
+const scored=parts.map((s,i)=>({
+s,i,
+score:(s.toLowerCase().match(/[a-z0-9]{3,}/g)||[])
+.reduce((a,w)=>a+(freq[w]||0),0)/(s.length/80+1)
+}));
+
+const count=Math.max(2,Math.ceil(parts.length*.3));
+const chosen=scored.sort((a,b)=>b.score-a.score).slice(0,count).sort((a,b)=>a.i-b.i);
+
+out.textContent=chosen.map(x=>'• '+x.s).join('\n\n')+'\n\n(Basic key-sentence summary, not AI-generated.)';
+}
+
+function copyOutput(id){
+const t=document.getElementById(id).textContent;
+if(!t||t.startsWith('Your summary')){
+alert('Nothing to copy yet.');
+return;
+}
+navigator.clipboard?.writeText(t).then(()=>alert('Copied!')).catch(()=>alert('Copy is not available in this browser.'));
+}
+
+function makeFlashcards(){
+const lines=document.getElementById('flashInput').value
+.split(/\n|(?<=[.!?])\s+/)
+.map(s=>s.trim())
+.filter(s=>s.length>10);
+
+if(!lines.length){
+alert('Enter some facts or definitions first.');
+return;
+}
+
+flashcards=lines.map((line,i)=>({
+front:'What is the key point '+(i+1)+'?',
+back:line
+}));
+
+flashIndex=0;
+flashFlipped=false;
+document.getElementById('flashArea').classList.remove('hidden');
+renderFlashcard();
+}
+
+function renderFlashcard(){
+if(!flashcards.length)return;
+const c=flashcards[flashIndex];
+document.getElementById('flashCard').textContent=flashFlipped?c.back:c.front;
+document.getElementById('flashCount').textContent=`Card ${flashIndex+1} of ${flashcards.length} · Tap the card to flip`;
+}
+
+function flipFlashcard(){
+flashFlipped=!flashFlipped;
+renderFlashcard();
+}
+
+function nextCard(){
+if(!flashcards.length)return;
+flashIndex=(flashIndex+1)%flashcards.length;
+flashFlipped=false;
+renderFlashcard();
+}
+
+function previousCard(){
+if(!flashcards.length)return;
+flashIndex=(flashIndex-1+flashcards.length)%flashcards.length;
+flashFlipped=false;
+renderFlashcard();
+}
+
+function makeQuiz(){
+const text=document.getElementById('quizInput').value.trim();
+const area=document.getElementById('quizArea');
+const parts=sentences(text).filter(s=>s.split(/\s+/).length>=6);
+
+if(parts.length<2){
+area.innerHTML='<p class="muted">Please paste at least two clear sentences with facts.</p>';
+return;
+}
+
+quizQuestions=parts.slice(0,8).map(s=>{
+const tokens=s.match(/\b[A-Za-z][A-Za-z0-9-]*\b/g)||[];
+const candidates=tokens.filter(w=>w.length>=5);
+if(!candidates.length)return null;
+
+const answer=candidates[Math.floor(candidates.length/2)];
+const masked=s.replace(new RegExp('\\b'+answer.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i'),'_____');
+
+const distractors=[...new Set(tokens.filter(w=>w.toLowerCase()!==answer.toLowerCase()&&w.length>=4))].slice(0,3);
+const options=[answer,...distractors].sort(()=>Math.random()-.5);
+
+while(options.length<4)options.push('None of these');
+
+return {question:masked,answer,options:options.slice(0,4)};
+}).filter(Boolean);
+
+quizIndex=0;
+quizScore=0;
+
+if(!quizQuestions.length){
+area.innerHTML='<p>Could not make questions from this text. Try different material.</p>';
+return;
+}
+
+renderQuiz();
+}
+
+function renderQuiz(){
+const area=document.getElementById('quizArea');
+
+if(quizIndex>=quizQuestions.length){
+area.innerHTML=`<h3>Quiz complete! 🎉</h3><p>Your score: ${quizScore} / ${quizQuestions.length}</p><button onclick="makeQuiz()">Try Again</button>`;
+return;
+}
+
+const q=quizQuestions[quizIndex];
+
+area.innerHTML=`
+<h3>Question ${quizIndex+1} of ${quizQuestions.length}</h3>
+<p>${escapeHTML(q.question)}</p>`+
+q.options.map(o=>`
+<button class="quiz-option" onclick="answerQuiz(this,${JSON.stringify(o).replace(/</g,'\\u003c')})">${escapeHTML(o)}</button>
+`).join('')+
+`<p id="quizFeedback" class="muted"></p>`;
+}
+
+function answerQuiz(button,choice){
+const q=quizQuestions[quizIndex];
+const buttons=document.querySelectorAll('.quiz-option');
+buttons.forEach(b=>b.disabled=true);
+
+if(choice.toLowerCase()===q.answer.toLowerCase()){
+quizScore++;
+button.classList.add('correct');
+document.getElementById('quizFeedback').textContent='Correct!';
+}else{
+button.classList.add('wrong');
+document.getElementById('quizFeedback').textContent='Correct answer: '+q.answer;
+buttons.forEach(b=>{
+if(b.textContent.toLowerCase()===q.answer.toLowerCase())b.classList.add('correct');
+});
+}
+
+const next=document.createElement('button');
+next.textContent=quizIndex===quizQuestions.length-1?'See Result':'Next Question';
+next.style.marginTop='10px';
+next.onclick=()=>{
+quizIndex++;
+renderQuiz();
+};
+document.getElementById('quizArea').appendChild(next);
+}
+</script>
+</body>
+</html>
